@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "name": "Meu App Python",
+    "description": "",
+    "created": "2025-06-13T22:42:35.983544"
+  },
+  "structure": {
+    "meu_app": {
+      "__init__.py": null,
+      "main.py": null,
+      "utils.py": null
+    },
+    "tests": {
+      "__init__.py": null,
+      "test_main.py": null
+    },
+    ".gitignore": null,
+    "README.md": null,
+    "requirements.txt": null
+  }
+}

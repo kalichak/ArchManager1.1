@@ -1,0 +1,11 @@
+Meu App Python/
+    ├── meu_app
+    │   ├── __init__.py
+    │   ├── main.py
+    │   └── utils.py
+    ├── tests
+    │   ├── __init__.py
+    │   └── test_main.py
+    ├── .gitignore
+    ├── README.md
+    └── requirements.txt

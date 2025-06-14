@@ -6,12 +6,14 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 # Diretórios principais
 ASSETS_DIR = PROJECT_ROOT / "assets"
-PRESETS_DIR = PROJECT_ROOT / "presets" # Salva presets dentro do projeto
+PRESETS_DIR = PROJECT_ROOT / "presets"
 
-# Caminhos para os ícones
-ICON_APP = ASSETS_DIR / "icon_pasta.ico"
-ICON_FOLDER = ASSETS_DIR / "icon_pasta.ico"
-ICON_FILE = ASSETS_DIR / "icon_arquivo.ico"
+# --- MUDANÇA AQUI ---
+# Caminhos para os ícones (agora como .png)
+ICON_APP = ASSETS_DIR / "icon_pasta.png" # Ícone da janela pode continuar .ico
+ICON_FOLDER = ASSETS_DIR / "icon_pasta.png"
+ICON_FILE = ASSETS_DIR / "icon_arquivo.png"
+# --------------------
 
 # Extensões de arquivo para a caixa de diálogo de criação
 FILE_EXTENSIONS = [
