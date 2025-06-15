@@ -2,6 +2,42 @@
 
 # Estrutura do Dicionário: Nome do Arquivo/Pasta: { sub-arquivos } ou None para arquivo
 PYTHON_BASIC_APP = {
+    "app": {
+        "__init__.py": None,
+        "main.py": None,
+        "utils.py": None,
+    },
+    "tests": {
+        "__init__.py": None,
+        "test_main.py": None,
+    },
+    ".gitignore": None,
+    "README.md": None,
+    "requirements.txt": None,
+}
+
+PYTHON_WEB_APP = {
+    "web_app": {
+        "__init__.py": None,
+        "app.py": None,
+        "routes.py": None,
+        "models.py": None,
+    },
+    "static": {
+        "css": {},
+        "js": {},
+        "images": {},
+    },
+    "templates": {
+        "index.html": None,
+        "layout.html": None,
+    },
+    ".gitignore": None,
+    "README.md": None,
+    "requirements.txt": None,
+}
+
+PYTHON_BASIC_APP_WITH_TESTS = {
     "meu_app": {
         "__init__.py": None,
         "main.py": None,
@@ -14,6 +50,29 @@ PYTHON_BASIC_APP = {
     ".gitignore": None,
     "README.md": None,
     "requirements.txt": None,
+}
+
+SQLITE_APP = {
+    "database": {
+        "db.sqlite3": None,
+        "__init__.py": None,
+    },
+    "app": {
+        "__init__.py": None,
+        "main.py": None,
+        "models.py": None,
+    },
+    ".gitignore": None,
+    "README.md": None,
+    "requirements.txt": None,
+}
+
+# Dicionário de templates de projeto
+PROJECT_TEMPLATES = {
+    "Python Basic App": PYTHON_BASIC_APP,
+    "Python Web App": PYTHON_WEB_APP,   
+    "Python Basic App with Tests": PYTHON_BASIC_APP_WITH_TESTS,
+    "SQLite App": SQLITE_APP,
 }
 
 # Conteúdo dos arquivos do template
