@@ -32,7 +32,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['C:\\Users\\Gabri\\OneDrive\\Área de Trabalho\\1166627.ico'],
 )
 coll = COLLECT(
     exe,

@@ -3,7 +3,8 @@
  False,
  False,
  True,
- ['C:\\Users\\Gabri\\OneDrive\\Área de Trabalho\\1166627.ico'],
+ 'C:\\Users\\Gabri\\OneDrive\\Documentos\\Codes\\Projetos '
+ 'VSCode\\Biblioteca\\ArchManager\\venv\\Lib\\site-packages\\PyInstaller\\bootloader\\images\\icon-windowed.ico',
  None,
  False,
  False,
@@ -88,7 +89,7 @@
  [],
  False,
  False,
- 1749946915,
+ 1749953658,
  [('runw.exe',
    'C:\\Users\\Gabri\\OneDrive\\Documentos\\Codes\\Projetos '
    'VSCode\\Biblioteca\\ArchManager\\venv\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\runw.exe',
