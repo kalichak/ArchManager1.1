@@ -20,3 +20,9 @@ FILE_EXTENSIONS = [
     ".txt", ".md", ".json", ".py", ".js", ".html", ".css", ".xml", ".gitignore",
     ".xls", ".xlsx", ".csv", ".doc", ".docx", ".pdf"
 ]
+
+# --- NOVO: LISTA DE ITENS A SEREM IGNORADOS NA IMPORTAÇÃO ---
+IGNORED_DIRS_AND_FILES = [
+    '.git', '__pycache__', '.vscode', '.idea', '.pytest_cache',
+    'build', 'dist', 'venv', '.venv', 'env', '*.egg-info'
+]

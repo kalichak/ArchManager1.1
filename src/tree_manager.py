@@ -4,7 +4,11 @@ import ttkbootstrap as ttk
 from tkinter import simpledialog, messagebox
 from pathlib import Path
 import logging
+import fnmatch  # Import para correspondência de padrões de arquivo
+
+# Imports que adicionamos para a nova funcionalidade
 from .ui_dialogs import CreateFileDialog
+from .app_config import IGNORED_DIRS_AND_FILES
 
 log = logging.getLogger(__name__)
 
@@ -77,7 +81,8 @@ class TreeManager:
         else: messagebox.showinfo("Não Encontrado", f"Nenhum item contendo '{search_term}' foi encontrado.")
 
     def clear_tree(self):
-        self.tree.delete(*self.tree.get_children()); self._notify_update("Árvore limpa.")
+        self.tree.delete(*self.tree.get_children());
+        # A notificação de "árvore limpa" será feita por quem chamou o clear_tree
         
     def get_structure(self, parent_id=""):
         return {self.tree.item(i, "text"): self.get_structure(i) or None for i in self.tree.get_children(parent_id)}
@@ -88,15 +93,45 @@ class TreeManager:
             is_folder = bool(children)
             item_id = self._insert_item(parent_id, name, is_folder=is_folder)
             if children: self.build_from_structure(children, parent_id=item_id)
-        self._notify_update("Estrutura carregada do preset.")
-        
+        self._notify_update("Estrutura carregada.")
+    
+    # --- FUNÇÃO CORRIGIDA ---
     def export_to_text(self, project_name="MeuProjeto"):
         if not self.tree.get_children(): return f"{project_name}/"
         lines = [f"{project_name}/"]; children = self.tree.get_children()
         for i, item_id in enumerate(children):
             self._export_recursive(item_id, "    ", i == len(children) - 1, lines)
         return "\n".join(lines)
-    
+
+    # --- MÉTODO NOVO PARA IMPORTAR ESTRUTURA ---
+    def load_from_directory(self, root_path: Path):
+        """
+        Limpa a árvore atual e a popula com a estrutura de diretórios de um caminho.
+        Ignora arquivos e pastas definidos em app_config.IGNORED_DIRS_AND_FILES.
+        """
+        self.clear_tree()
+        self._populate_tree_recursive(root_path, "")
+        log.info(f"Estrutura de '{root_path.name}' carregada na árvore.")
+
+    # --- MÉTODO AUXILIAR NOVO RECURSIVO ---
+    def _populate_tree_recursive(self, current_path: Path, parent_item_id: str):
+        """
+        Método recursivo que varre um diretório e adiciona seus conteúdos à árvore.
+        """
+        try:
+            items = sorted(list(current_path.iterdir()), key=lambda p: (not p.is_dir(), p.name.lower()))
+            for item in items:
+                if any(fnmatch.fnmatch(item.name, pattern) for pattern in IGNORED_DIRS_AND_FILES):
+                    continue
+                is_folder = item.is_dir()
+                item_id = self._insert_item(parent_item_id, item.name, is_folder=is_folder)
+                if is_folder:
+                    self._populate_tree_recursive(item, item_id)
+        except PermissionError:
+            log.warning(f"Sem permissão para ler o diretório: {current_path}")
+        except Exception as e:
+            log.error(f"Erro ao ler o diretório {current_path}: {e}")
+            
     def get_selected_item(self):
         selection = self.tree.selection(); return selection[0] if selection else None
         
@@ -107,17 +142,20 @@ class TreeManager:
 
     def is_folder_node(self, item_id):
         if not item_id: return True
+        # A maneira mais segura de saber se é uma pasta é ver se tem filhos,
+        # ou se não tem extensão (com algumas exceções, mas é uma boa heurística).
         if self.tree.get_children(item_id): return True
+        tags = self.tree.item(item_id, "tags")
+        if "folder" in tags: return True # Se usarmos tags para marcar
         item_text = self.tree.item(item_id, "text")
-        # Um arquivo sem extensão ainda é tratado como pasta (ex: 'LICENSE')
-        return not Path(item_text).suffix
-        
+        return "." not in item_text
+
     def _bind_events(self):
         self.tree.bind("<ButtonPress-1>", self._on_drag_start)
         self.tree.bind("<B1-Motion>", self._on_drag_motion)
         self.tree.bind("<ButtonRelease-1>", self._on_drag_stop)
 
-    def _notify_update(self, message: str):
+    def _notify_update(self, message: str = "Estrutura atualizada."):
         log.info(message)
         if self.on_update_callback: self.on_update_callback()
 
@@ -130,8 +168,9 @@ class TreeManager:
 
     def _insert_item(self, parent_id, text, is_folder=False):
         icon = self.icons.get("folder") if is_folder else self._get_icon_for_file(text)
-        opts = {"text": text, "open": True};
+        opts = {"text": text, "open": True}
         if icon: opts["image"] = icon
+        if is_folder: opts["tags"] = ("folder",)
         return self.tree.insert(parent_id, tk.END, **opts)
 
     def _update_icon(self, item_id):
@@ -139,6 +178,7 @@ class TreeManager:
         icon_key = "folder" if is_folder else self._get_icon_for_file(self.tree.item(item_id, "text"))
         if self.icons.get(icon_key): self.tree.item(item_id, image=self.icons.get(icon_key))
             
+    
     def _find_recursive(self, search_term, parent_item=""):
         for item_id in self.tree.get_children(parent_item):
             if search_term in self.tree.item(item_id, "text").lower(): return item_id
@@ -156,18 +196,36 @@ class TreeManager:
     def _on_drag_start(self, event):
         item = self.tree.identify_row(event.y);
         if item: self.drag_data["item"] = item
+        
     def _on_drag_motion(self, event):
         if not self.drag_data["item"]: return
-        target = self.tree.identify_row(event.y)
-        if not target: self.tree.move(self.drag_data["item"], "", tk.END); return
-        descendants = self._get_all_descendants(self.drag_data["item"])
-        if target != self.drag_data["item"] and target not in descendants:
-            if self.is_folder_node(target): self.tree.move(self.drag_data["item"], target, tk.END)
-            else: self.tree.move(self.drag_data["item"], self.tree.parent(target), tk.END)
+        target_item = self.tree.identify_row(event.y)
+        if target_item:
+            if self.is_folder_node(target_item):
+                self.tree.move(self.drag_data["item"], target_item, self.tree.index(target_item))
+            else:
+                parent = self.tree.parent(target_item)
+                self.tree.move(self.drag_data["item"], parent, self.tree.index(target_item))
+
     def _get_all_descendants(self, item_id):
         descendants = []; children = self.tree.get_children(item_id)
         descendants.extend(children)
         for child in children: descendants.extend(self._get_all_descendants(child))
         return descendants
+        
     def _on_drag_stop(self, event):
-        if self.drag_data["item"]: self.drag_data["item"] = None; self._notify_update("Item movido.")
+        if not self.drag_data["item"]: return
+        
+        item_to_move = self.drag_data["item"]
+        self.drag_data["item"] = None
+        
+        target_item = self.tree.identify_row(event.y)
+        if not target_item: # Movido para o espaço vazio (raiz)
+            self.tree.move(item_to_move, "", tk.END)
+        else:
+            # Lógica para mover para dentro ou ao lado de um item
+            # A lógica no _on_drag_motion já deve ter posicionado corretamente,
+            # aqui apenas confirmamos e notificamos.
+            pass
+
+        self._notify_update("Item movido.")

@@ -1,0 +1,30 @@
+{
+  "metadata": {
+    "name": "ArchManager",
+    "description": "Ideia de aplicação com 3 janelas de funções.\n\n\n    └── ArchManager\n        ├── src\n        │   ├── __init__.py\n        │   ├── app_config.py\n        │   ├── build_window.py\n        │   ├── logger_setup.py\n        │   ├── main_window.py\n        │   ├── organizer_window.py\n        │   ├── project_templates.py\n        │   ├── preset_manager.py\n        │   ├── test_runner.py\n        │   ├── tree_manager.py\n        │   └── ui_dialogs.py\n        ├── assets\n        │   └── colocar_imagens_aqui.txt\n        ├── main.py\n        ├── requirements.txt\n        └── Readme.md",
+    "created": "2025-06-16T20:07:11.571754"
+  },
+  "structure": {
+    "ArchManager": {
+      "src": {
+        "__init__.py": null,
+        "app_config.py": null,
+        "build_window.py": null,
+        "logger_setup.py": null,
+        "main_window.py": null,
+        "organizer_window.py": null,
+        "project_templates.py": null,
+        "preset_manager.py": null,
+        "test_runner.py": null,
+        "tree_manager.py": null,
+        "ui_dialogs.py": null
+      },
+      "assets": {
+        "colocar_imagens_aqui.txt": null
+      },
+      "main.py": null,
+      "requirements.txt": null,
+      "Readme.md": null
+    }
+  }
+}
